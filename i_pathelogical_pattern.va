@@ -1,0 +1,48 @@
+// VerilogA for video_SDI, i_pathelogical_pattern, beriloga
+// Harry LI, July 2017.
+
+// This is a module specifically generating a pathological pattern for testing a video SDI device. 
+
+// We are going to generate a bit string repeating the signal defined by the following four lines.
+// ----- ( 4 lines ) * ( pixel number per line ) of PRBS signals. ------------------------------------
+// ----- ( 20bit per pixel (19 high and 1 low) ) * ( pixel number per line ) -------------------------
+// ----- ( 4 lines ) * ( pixel number per line ) of PRBS signals. ------------------------------------
+// ----- ( 20bit per pixel (19 low and 1 high) ) * ( pixel number per line ) -------------------------
+
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module i_pathelogical_pattern(iout);
+// Pins.
+	output iout;
+	electrical iout;
+// Parameters.
+	parameter real frequency = 2.97G;
+	parameter integer seed = (2^31-1);
+	parameter real ilogical_high = 1m;
+	parameter real iougical_low =0;
+	parameter real tdel=0 from [0,inf);
+	parameter real trise=0.1n;
+	parameter real tfall=0.1n;
+	parameter integer pix_num_perline =1920;
+// Variables.
+	real tperiod;
+	integer bit_num;
+	integer line_num;
+	real begintime;
+	integer counter;
+	real next;
+	integer bit;
+	real iout_val;
+	integer iseed;
+	integer judg;
+	
+	tperiod = 1 / frequency;
+	
+// ---------------------------------------------------------------------------------------------------
+
+	analog begin
+		@(initial_step) begin
+			begintime = $abstime;
+			next = $abstime +
