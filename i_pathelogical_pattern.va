@@ -21,7 +21,7 @@ module i_pathelogical_pattern(iout);
 	parameter real frequency = 2.97G;
 	parameter integer seed = (2^31-1);
 	parameter real ilogical_high = 1m;
-	parameter real iougical_low =0;
+	parameter real ilogical_low =0;
 	parameter real tdel=0 from [0,inf);
 	parameter real trise=0.1n;
 	parameter real tfall=0.1n;
@@ -45,4 +45,12 @@ module i_pathelogical_pattern(iout);
 	analog begin
 		@(initial_step) begin
 			begintime = $abstime;
-			next = $abstime +
+			next = $abstime + tperiod;
+			bit = 0;
+			iseed = seed;
+			iout_val = ilogical_low;
+			counter = 0;
+		end
+		
+		$bound_step(tperiod);
+		
