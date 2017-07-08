@@ -43,7 +43,8 @@ module i_pathelogical_pattern(iout);
 // ---------------------------------------------------------------------------------------------------
 
 	analog begin
-		@(initial_step) begin
+		
+		@ (initial_step) begin
 			begintime = $abstime;
 			next = $abstime + tperiod;
 			bit = 0;
@@ -54,3 +55,16 @@ module i_pathelogical_pattern(iout);
 		
 		$bound_step(tperiod);
 		
+		@ (timer(next)) begin
+			bit_num = (($abstime - begintime) / tperiod);
+			judg = ((bitnum / pix_num_perline) %48);
+			bit = (judg <= 23)?
+				1:0;
+			bit = (((judg >= 0) && (judg <= 3)) || ((judg >= 24) && (judg <= 27)))? 
+				($random(iseed) & 1) : (!bit);
+			iout_val = (ilogical_high - ilogical_low) * bit +ilogical_low;
+			next = next + tperiod;
+		end
+	I(iout) <+ transition(iout_val, tdel, trise, tfall);
+	end
+endmodule
